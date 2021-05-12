@@ -24,6 +24,8 @@ import java.sql.SQLException;
 
 public class DefaultPageController extends AbsController {
     @FXML
+    private JFXButton trackRobot;
+    @FXML
     private JFXButton credits;
     @FXML
     private JFXButton navigation;
