@@ -201,7 +201,6 @@ public class DefaultPageController extends AbsController {
     private void handleButtonPushed(ActionEvent actionEvent) throws IOException, SQLException {
 
         Button buttonPushed = (Button) actionEvent.getSource();  //Getting current stage
-
         if (buttonPushed == loginButton) {
             if(CurrentUser.getCurrentUser().isAuthenticated()) {
                 CurrentUser.getCurrentUser().logout();
@@ -261,11 +260,14 @@ public class DefaultPageController extends AbsController {
                     }
                 }
                 else{
-                    fillOutTheSurvey.setStyle("-fx-text-fill: #c60000FF;");
+                    fillOutTheSurvey.setStyle("-fx-text-fill: #c60000;");
                 }
             }
         else if (buttonPushed == quitEntry) {
             Platform.exit();
+        }
+        else if (buttonPushed == trackRobot){
+            SceneContext.getSceneContext().switchScene("/edu/wpi/cs3733/D21/teamF/fxml/RobotPageView.fxml");
         }
         }
     private String completed(String ticketID) throws SQLException {

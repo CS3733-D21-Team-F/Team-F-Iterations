@@ -1,12 +1,23 @@
 package edu.wpi.cs3733.D21.teamF.controllers.ServiceRequestsControllers;
 
 import com.jfoenix.controls.*;
+import com.sun.xml.internal.fastinfoset.util.StringArray;
 import edu.wpi.cs3733.D21.teamF.controllers.ServiceRequests;
 import edu.wpi.cs3733.D21.teamF.database.DatabaseAPI;
+import edu.wpi.cs3733.D21.teamF.utils.CSVManager;
 import edu.wpi.cs3733.D21.teamF.utils.EmailHandler;
 import edu.wpi.cs3733.D21.teamF.utils.SceneContext;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+
+import java.util.HashMap;
+import java.util.List;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -28,9 +39,45 @@ public class GiftDeliveryServiceRequestController extends ServiceRequests {
     @FXML private JFXCheckBox magazinesCheckBox;
     @FXML private JFXDatePicker dateField;
     @FXML private JFXTimePicker timeField;
+    @FXML private JFXComboBox<String> destination;
+    @FXML private JFXButton runRobot;
+    @FXML private JFXTextField robotIP;
 
-    @FXML
-    public void initialize(){
+
+
+    public void initialize() throws Exception {
+     List<String[]> nodeData = CSVManager.load("FullerMapNodes.csv");
+
+        HashMap<String, Byte> lookup = new HashMap();
+
+        lookup.put("lecture hall", Byte.parseByte("1"));
+        lookup.put("B19", Byte.parseByte("2"));
+        lookup.put("B20 and B34", Byte.parseByte("3"));
+        lookup.put("B21", Byte.parseByte("4"));
+        lookup.put("B33", Byte.parseByte("5"));
+        lookup.put("B22 and B29", Byte.parseByte("6"));
+        lookup.put("B23", Byte.parseByte("7"));
+        lookup.put("B24", Byte.parseByte("8"));
+        lookup.put("B26", Byte.parseByte("9"));
+        lookup.put("B30", Byte.parseByte("10"));
+        lookup.put("B27 and B28", Byte.parseByte("11"));
+
+        destination.getItems().addAll(lookup.keySet());
+        runRobot.setOnAction(event -> {
+            if(destination.getValue() != null){
+                final HttpPost postRequest = new HttpPost("http://" + robotIP.getText() + "/");
+                final ByteArrayEntity byteArrayEntity = new ByteArrayEntity(new byte[]{lookup.get(destination.getValue())}, ContentType.DEFAULT_TEXT);
+                postRequest.setEntity(byteArrayEntity);
+
+                final HttpClient client = HttpClients.createDefault();
+                try {
+                    final HttpResponse response = client.execute(postRequest);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
     public String setSpecialInstructions(){
